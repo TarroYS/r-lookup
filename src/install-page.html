@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>R lookup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* VOICE: a step-by-step setup guide for teammates, plain and explicit; nothing assumed.
+   IDEA: the top of a Chrome window, with the bookmarks already sitting on its bookmarks bar.
+   PICTURE: a drawn browser (tab, address bar, bookmarks bar holding the real, draggable bookmarks) on a violet field; clicking one shows the exact page that bookmark opens.
+   COLOUR and TYPE: Tarro violet field, browser greys, greendot green and Tarro violet dots, near-black ink; Inter.
+   LAYOUT: title and picture full width; then one readable column: setup steps, using it, what each opens, fixes, address-bar route, by-hand fallback. */
+:root{color-scheme:light dark;--bg:light-dark(#ffffff,#0f0d17);--ink:light-dark(#151321,#ece9f6);--muted:light-dark(#5d5a6e,#a8a3bd);--line:light-dark(#e6e3ef,#2e2b3b);
+  --field:#3b1585;--field-ink:#f4f0ff;--strip:light-dark(#dfe1e6,#1b1c1f);--tab:light-dark(#ffffff,#35363a);--pill:light-dark(#f1f3f4,#28292c);
+  --page:light-dark(#ffffff,#202124);--hover:light-dark(#efeafb,#3d3a4a);--soft:light-dark(#f7f5fc,#17151f);--accent:light-dark(#5b21b6,#c4b5fd)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:clip}
+.band{padding:clamp(28px,4vw,56px) max(5vw,16px)}
+.wrap{max-width:1040px;margin:0 auto}
+.col{max-width:760px;margin:0 auto}
+.top{background:var(--field);color:var(--field-ink);padding-bottom:clamp(36px,5vw,64px)}
+h1{font-size:clamp(34px,5vw,48px);line-height:1.05;margin:0 0 10px;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+.lede{margin:0 0 28px;font-size:18px;max-width:54ch;opacity:.92}
+.browser{border-radius:14px;overflow:hidden;background:var(--page);color:var(--ink);box-shadow:0 30px 70px rgb(10 4 30/.45)}
+.tabs{display:flex;align-items:flex-end;gap:14px;background:var(--strip);padding:10px 14px 0}
+.lights{display:flex;gap:7px;padding-bottom:12px}.lights i{width:12px;height:12px;border-radius:50%;background:light-dark(#c4c6cc,#4a4b50)}
+.tab{background:var(--tab);border-radius:10px 10px 0 0;padding:8px 18px 9px;font-size:13px;color:var(--muted);max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tool{background:var(--tab);padding:8px 14px 6px}
+.address{background:var(--pill);border-radius:99px;padding:7px 16px;font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:4px 2px;background:var(--tab);padding:6px 10px 8px;border-bottom:1px solid var(--line)}
+.group{font-size:12px;color:var(--muted);padding:0 4px 0 8px}
+.sep{width:1px;height:20px;background:var(--line);margin:0 6px}
+.bm{display:inline-flex;align-items:center;gap:7px;min-height:38px;padding:6px 11px;border-radius:9px;color:var(--ink);text-decoration:none;font-size:14px;font-weight:500;cursor:grab;border:1px dashed transparent;white-space:nowrap}
+.bm:hover{background:var(--hover);border-color:light-dark(#b9addf,#5e5777)}
+.bm:focus-visible,.copy:focus-visible,summary:focus-visible{outline:2px solid #7c3aed;outline-offset:2px}
+.bm:active{cursor:grabbing}
+.dot{width:9px;height:9px;border-radius:50%;flex:none;display:inline-block}
+.page{min-height:210px;display:grid;place-content:center;justify-items:center;gap:8px;padding:28px 20px;text-align:center}
+.page.demo-on{display:block;padding:0}
+.page.demo-on #intro{display:none}
+iframe.demo{display:block;width:100%;height:300px;border:0}
+.hint{margin:0;font-size:18px;font-weight:600}
+.arrow{display:inline-block;animation:nudge 1.4s ease-in-out 3}
+@keyframes nudge{50%{transform:translateY(-6px)}}
+@media (prefers-reduced-motion:reduce){.arrow{animation:none}}
+.sub{margin:0;color:var(--muted);font-size:15px}
+.result{margin:8px 0 0;padding:10px 14px;border-radius:10px;background:var(--soft);border:1px solid var(--line);font-size:14px;max-width:100%}
+.result code{display:block;font:600 13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;overflow-wrap:anywhere}
+section{margin:0 0 44px}
+h2{font-size:24px;line-height:1.2;margin:0 0 6px;font-weight:650}
+.lead{margin:0 0 16px;color:var(--muted)}
+h3{font-size:17px;margin:22px 0 8px;font-weight:650}
+ol,ul{margin:0;padding-left:1.4em}li{margin:0 0 12px}li::marker{color:var(--muted);font-weight:600}
+.steps>li{padding-left:4px}
+.steps b{display:block;margin-bottom:2px}
+kbd{font:600 13px/1 ui-monospace,SFMono-Regular,Menlo,monospace;padding:3px 6px;border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;background:var(--soft);white-space:nowrap}
+.muted{color:var(--muted)}
+.note{margin:10px 0 0;padding:10px 14px;border-radius:10px;background:var(--soft);border:1px solid var(--line);font-size:15px}
+.ops{display:grid;gap:10px}
+.op{padding:12px 14px;border:1px solid var(--line);border-radius:12px}
+.op-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px}
+.op-head b{display:inline-flex;align-items:center;gap:8px;font-size:16px}
+.op code{display:block;margin-top:4px;font:12.5px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--muted);overflow-wrap:anywhere}
+.fixes li b{font-weight:650}
+.ss{display:grid;gap:10px;margin:14px 0 8px}
+.ss-row{display:grid;grid-template-columns:minmax(0,9.5em) minmax(0,7em) minmax(0,1fr);gap:8px 14px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:12px}
+.ss-name{display:flex;align-items:center;gap:8px;font-weight:600}
+.ss-key{font-size:14px;color:var(--muted)}
+.field{display:flex;gap:8px;align-items:center}
+.field input{flex:1;width:0;font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;padding:9px 10px;border-radius:9px;border:1px solid var(--line);background:var(--soft);color:var(--ink)}
+details{border:1px solid var(--line);border-radius:14px;padding:4px 18px;background:var(--soft)}
+summary{cursor:pointer;font-weight:650;font-size:18px;padding:12px 0;min-height:44px}
+.code-row{margin:14px 0 18px}
+.code-head{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:6px;font-size:15px}
+.code-head .muted{font-size:13px}
+.copy{margin-left:auto;font:600 14px Inter,system-ui,sans-serif;min-height:40px;padding:6px 16px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer;flex:none}
+textarea{display:block;width:100%;resize:vertical;font:12px/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;padding:8px 10px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.foot{margin:28px 0 0;font-size:13px;color:var(--muted)}
+@media (max-width:700px){.ss-row{grid-template-columns:1fr auto}.ss-row .field{grid-column:1/-1}}
+@media (max-width:600px){.lights{display:none}.page{min-height:160px}.lede{font-size:17px}.group{width:100%;padding:6px 8px 0}.sep{display:none}}
+</style>
+</head>
+<body>
+<header class="band top">
+  <div class="wrap">
+    <h1>R lookup</h1>
+    <p class="lede">Open any restaurant by its R number, from any tab, even a blank new one: click a bookmark, type the 5 digits, and the page opens. No Enter needed.</p>
+    <div class="browser">
+      <div class="tabs"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><span class="tab">New Tab</span></div>
+      <div class="tool"><div class="address">Search Google or type a URL</div></div>
+      <nav class="bar" aria-label="Bookmarks to install">
+        <!--BAR-->
+      </nav>
+      <div class="page" id="page">
+        <div id="intro">
+          <p class="hint"><span class="arrow" aria-hidden="true">↑</span> Drag these onto your own bookmarks bar</p>
+          <p class="sub">Click one here to preview what it does.</p>
+          <p class="result" id="result" hidden>In a real tab, this would go to<code></code></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="band">
+  <div class="col">
+    <section id="setup">
+      <h2>Set it up</h2>
+      <p class="lead">About 2 minutes, in Google Chrome. You only do this once.</p>
+      <ol class="steps">
+        <li><b>Open this page in Google Chrome.</b>
+          If the link opened in Safari or another browser, copy the address from the address bar, open Chrome, paste it into Chrome's address bar and press <kbd>Enter</kbd>.</li>
+        <li><b>Show your bookmarks bar.</b>
+          Press <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>B</kbd> on a Mac, or <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>B</kbd> on Windows. A thin bar appears just under Chrome's address bar. The same keys hide it again, so press them once.</li>
+        <li><b>Only if you set up R lookup before: remove the old ones.</b>
+          On your bookmarks bar, right-click each old one (Agent UI, Wsheet, Wira, Tarro Manager, Restaurant Config) and choose <b style="display:inline">Delete</b>.</li>
+        <li><b>Drag each bookmark you want onto your bar.</b>
+          In the picture at the top of this page, press and hold a bookmark (for example <i>Wsheet</i>), move it up onto your own bookmarks bar, and let go. It appears on your bar with the same name. Repeat for the others.</li>
+        <li><b>Try it.</b>
+          Open a new tab (<kbd>Cmd</kbd> + <kbd>T</kbd>), click <i>Wsheet</i> on your bar, and type <b style="display:inline">85791</b>. The Wsheet for R85791 opens by itself.</li>
+      </ol>
+    </section>
+
+    <section id="use">
+      <h2>Using it</h2>
+      <ul>
+        <li>Click a bookmark on any tab, even a new one. A box appears with the <b>R</b> already filled in. Type the 5 digits and the page opens. No Enter needed.</li>
+        <li>To keep the page you're on, hold <kbd>Cmd</kbd> + <kbd>Shift</kbd> (<kbd>Ctrl</kbd> + <kbd>Shift</kbd> on Windows) while you click the bookmark. It opens in a new tab.</li>
+        <li>You can paste instead of typing: a link, or text like <i>NEW CHINA (R82788)</i>. It picks out the R number.</li>
+        <li>Shorter number? Type it and press <kbd>Enter</kbd>. Changed your mind? Press <kbd>Esc</kbd>.</li>
+      </ul>
+    </section>
+
+    <section id="opens">
+      <h2>What each bookmark opens</h2>
+      <p class="lead">Shown for R85791.</p>
+      <div class="ops">
+        <!--OPENS-->
+      </div>
+      <p class="note">TMA switches the restaurant selected in Tarro Manager, the same as picking it in the Restaurants list.</p>
+    </section>
+
+    <section id="fixes">
+      <h2>If something doesn't work</h2>
+      <ul class="fixes">
+        <li><b>Clicking a bookmark on this page doesn't open anything.</b> That's expected: here it only shows a preview. Drag it onto your bar and use it from there.</li>
+        <li><b>What you type goes into the address bar, not the box.</b> Click once anywhere on the box's page, then type.</li>
+        <li><b>A bookmark won't drag.</b> Add it by hand instead: see <i>Can't drag?</i> at the bottom of this page.</li>
+        <li><b>You land on a sign-in page.</b> Sign in to Greendot or Tarro Manager in Chrome. The bookmark only takes you to the page.</li>
+        <li><b>The R number has 6 digits.</b> Paste it. Typing opens the page as soon as 5 digits are in.</li>
+      </ul>
+    </section>
+
+    <section id="site-search">
+      <h2>Prefer the keyboard? Address-bar shortcuts</h2>
+      <p class="lead">Instead of clicking a bookmark, type a short code in Chrome's address bar. This one needs Enter, but it works from any tab without the bookmarks.</p>
+      <h3>Set it up once (about 2 minutes)</h3>
+      <ol class="steps">
+        <li><b>Open Chrome's search settings.</b>
+          Click <b style="display:inline">Copy</b>, click Chrome's address bar, paste, and press <kbd>Enter</kbd>.
+          <span class="field" style="max-width:440px;margin-top:8px"><input id="ss-settings" readonly value="chrome://settings/searchEngines" aria-label="Chrome settings address"><button class="copy" type="button" data-for="ss-settings">Copy</button></span></li>
+        <li><b>Scroll down to "Site search" and click Add next to it.</b>
+          A small box opens with three fields.</li>
+        <li><b>Fill in the three fields from one row below, then click Add.</b>
+          <i>Name</i>: type the name. <i>Shortcut</i>: type the shortcut. <i>URL with %s in place of query</i>: click the row's Copy button and paste.</li>
+        <li><b>Repeat step 3 for each one you want.</b></li>
+      </ol>
+      <div class="ss">
+        <!--SITE_SEARCH-->
+      </div>
+      <h3>Use it</h3>
+      <p>Press <kbd>Cmd</kbd> + <kbd>T</kbd>, type the shortcut (for example <b>ws</b>) and press <kbd>Space</kbd>. The address bar switches to that site. Type the 5 digits and press <kbd>Enter</kbd>. Type only the digits: the R is already in the URL.</p>
+    </section>
+
+    <details>
+      <summary>Can't drag? Add a bookmark by hand</summary>
+      <ol class="steps">
+        <li><b>Click Copy next to the one you want below.</b></li>
+        <li><b>Right-click your bookmarks bar and choose "Add page…".</b></li>
+        <li><b>Fill in the box and save.</b> <i>Name</i>: type the bookmark's name (for example Wsheet). <i>URL</i>: delete what's there and paste. Click <b style="display:inline">Save</b>.</li>
+      </ol>
+      <!--COPY_ROWS-->
+    </details>
+    <p class="foot"><!--VERSION--></p>
+  </div>
+</main>
+<script>
+{
+  const page = document.getElementById('page');
+  const result = document.getElementById('result');
+  let frame = null;
+  // Each bookmark holds a whole small page; decode it to show the same page here.
+  const pageOf = (href) => new TextDecoder().decode(Uint8Array.from(atob(href.slice(href.indexOf(',') + 1)), (c) => c.charCodeAt(0)));
+  const closeDemo = () => {
+    if (frame) frame.remove();
+    frame = null;
+    page.classList.remove('demo-on');
+  };
+  for (const a of document.querySelectorAll('a.bm')) {
+    // A web page isn't allowed to open these pages itself, so clicking shows a preview; dragging still carries the real bookmark.
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      closeDemo();
+      result.hidden = true;
+      frame = document.createElement('iframe');
+      frame.className = 'demo';
+      frame.title = a.textContent.trim() + ' preview';
+      frame.srcdoc = pageOf(a.href);
+      page.prepend(frame);
+      page.classList.add('demo-on');
+      frame.addEventListener('load', () => frame && frame.focus());
+    });
+  }
+  window.addEventListener('message', (e) => {
+    if (!frame || e.source !== frame.contentWindow || !e.data) return;
+    if (e.data.rLookup === 'open') {
+      result.querySelector('code').textContent = e.data.url;
+      result.hidden = false;
+      closeDemo();
+    } else if (e.data.rLookup === 'close') {
+      closeDemo();
+    }
+  });
+  for (const b of document.querySelectorAll('button.copy')) {
+    b.addEventListener('click', async () => {
+      const box = document.getElementById(b.dataset.for);
+      try {
+        await navigator.clipboard.writeText(box.value);
+        b.textContent = 'Copied';
+      } catch (err) {
+        box.focus();
+        box.select();
+        b.textContent = 'Press Cmd+C';
+      }
+      setTimeout(() => { b.textContent = 'Copy'; }, 2500);
+    });
+  }
+}
+</script>
+</body>
+</html>

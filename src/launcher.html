@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{LABEL}} · R lookup</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='6' fill='{{COLOR}}'/%3E%3C/svg%3E">
+<style>
+:root{color-scheme:light dark}
+html,body{margin:0}
+body{min-height:100vh;background:light-dark(#e9e7f1,#14121b);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;display:flex;justify-content:center;align-items:flex-start;padding:18vh 16px 24px;box-sizing:border-box}
+.card{background:#fff;color:#0f172a;border-radius:16px;padding:16px 18px 12px;width:320px;max-width:100%;box-shadow:0 24px 60px rgba(15,23,42,.28);line-height:1.4}
+.head{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;margin-bottom:10px}
+.dot{width:8px;height:8px;border-radius:50%;background:{{COLOR}};flex:none}
+label{display:flex;align-items:center;gap:2px;border:2px solid {{COLOR}};border-radius:12px;padding:6px 14px;cursor:text}
+.r,input{font:700 30px/1.25 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.06em}
+.r{color:{{COLOR}}}
+input{flex:1;width:0;min-width:0;border:0;outline:0;background:transparent;color:#0f172a;padding:0;margin:0}
+.hint{font-size:12px;color:#64748b;margin-top:8px}
+</style>
+</head>
+<body>
+<main class="card">
+  <div class="head"><span class="dot"></span>{{TITLE}}</div>
+  <label><span class="r">R</span><input id="n" inputmode="numeric" autocomplete="off" spellcheck="false" aria-label="{{TITLE}}, R number" autofocus></label>
+  <div class="hint">Opens after {{DIGITS}} digits. Esc to go back.</div>
+</main>
+<script>
+{
+  const BASE = {{BASE_JSON}};
+  const DIGITS = {{DIGITS}};
+  const framed = window !== window.top; // the install page's demo shows this same page in a frame
+  const n = document.getElementById('n');
+  const go = (digits) => {
+    const url = BASE + 'R' + digits;
+    if (framed) parent.postMessage({ rLookup: 'open', url }, '*');
+    else location.replace(url); // replace: Back skips this page
+  };
+  const leave = () => {
+    if (framed) parent.postMessage({ rLookup: 'close' }, '*');
+    else if (history.length > 1) history.back();
+    else window.close(); // it was opened in a tab of its own
+  };
+  // Pasted text ("NEW CHINA (R82788)", a link) gives its first R number; otherwise the first run of digits.
+  const pick = (text) => {
+    const m = text.match(/R *([0-9]+)/) || text.match(/([0-9]+)/);
+    return m ? m[1] : '';
+  };
+  n.addEventListener('input', (e) => {
+    const digits = pick(n.value);
+    if (n.value !== digits) n.value = digits;
+    if (digits.length === DIGITS || (digits.length > DIGITS && e.inputType === 'insertFromPaste')) go(digits);
+  });
+  n.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') leave();
+    if (e.key === 'Enter') {
+      const digits = pick(n.value);
+      if (digits) go(digits);
+    }
+  });
+  // Any click on the page puts the cursor back in the box.
+  document.addEventListener('mousedown', (e) => {
+    if (e.target !== n) {
+      e.preventDefault();
+      n.focus();
+    }
+  });
+  window.addEventListener('focus', () => n.focus());
+  n.focus();
+}
+</script>
+</body>
+</html>

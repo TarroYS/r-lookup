@@ -1,0 +1,13 @@
+{
+  "name": "r-lookup",
+  "private": true,
+  "type": "module",
+  "description": "Chrome bookmarks that open a restaurant's page from its R number",
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node test.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.63.0"
+  }
+}
