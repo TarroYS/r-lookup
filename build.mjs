@@ -2,7 +2,7 @@
 // and the team setup page, which also lists the matching Chrome site-search shortcuts.
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 
-const VERSION = 'Version 4 · November 2026';
+const VERSION = 'Version 5 · November 2026';
 const DIGITS = 5;
 const EXAMPLE = '85791';
 const GREEN = 'rgb(21,128,61)';
@@ -13,6 +13,7 @@ const DESTS = [
   { id: 'wsheet', label: 'Wsheet', key: 'ws', system: 'Greendot', what: "The restaurant's Wsheet", base: GD + 'wsheets/', color: GREEN },
   { id: 'wira', label: 'Wira', key: 'wr', system: 'Greendot', what: "The restaurant's page in Wira", base: GD + 'wira/restaurants/', color: GREEN },
   { id: 'pospreview', label: 'POS Preview', key: 'pp', system: 'Greendot', what: 'POS preview (APAC server)', base: 'https://greendot.apac.prod.letsdowonders.io/internal/restaurant-preview?platform1=rpos&r=', color: GREEN },
+  { id: 'mic', label: 'Mic', key: 'mc', system: 'Greendot', what: "The restaurant's Mic page (APAC server)", base: 'https://greendot.apac.prod.letsdowonders.io/greendot/mic/', color: GREEN },
   { id: 'tma', label: 'TMA', key: 'tma', system: 'Tarro Manager', what: 'Tarro Manager, with that restaurant selected (Home)', base: 'https://app.wondersco.com/?rNumber=', color: VIOLET },
 ];
 

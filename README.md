@@ -10,6 +10,7 @@ Open a restaurant by its R number from Chrome: click a bookmark, type the 5 digi
 | Wsheet | The restaurant's Wsheet | `ws` |
 | Wira | The restaurant's page in Wira | `wr` |
 | POS Preview | POS preview (APAC server) | `pp` |
+| Mic | The restaurant's Mic page (APAC server) | `mc` |
 | TMA | Tarro Manager with that restaurant selected (Home) | `tma` |
 
 ## How it works

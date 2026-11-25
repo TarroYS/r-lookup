@@ -42,7 +42,7 @@ const PREV = 'https://example.test/previous-page';
 // 1. Install page carries exactly the built bookmarks and site-search addresses.
 await page.goto(INSTALL);
 const pills = await page.$$eval('a.bm', (as) => as.map((a) => ({ id: a.dataset.id, text: a.textContent.trim(), href: a.href, title: a.getAttribute('title') })));
-ok('install page: 5 bookmarks', pills.length === 5);
+ok(`install page: ${D.length} bookmarks`, pills.length === D.length);
 for (const p of pills) {
   const d = by[p.id];
   ok(`install page: "${d.label}" name = link text; dragged address = the built page`, p.text === d.label && p.title === null && p.href === d.code);
@@ -54,7 +54,7 @@ ok('site search: typing 82788 after the shortcut gives the same address as the b
 const examples = await page.$$eval('.op', (els) => Object.fromEntries(els.map((e) => [e.dataset.id, e.querySelector('code').textContent])));
 ok('install page: "What each bookmark opens" examples match the bookmarks', D.every((d) => examples[d.id] === d.base + 'R85791'), JSON.stringify(examples.pospreview));
 const names = pills.map((p) => p.text).join(', ');
-ok('install page: bookmarks are AUI, Wsheet, Wira, POS Preview, TMA', names === 'AUI, Wsheet, Wira, POS Preview, TMA', names);
+ok('install page: bookmarks are AUI, Wsheet, Wira, POS Preview, Mic, TMA', names === 'AUI, Wsheet, Wira, POS Preview, Mic, TMA', names);
 
 // 2. Install page preview: clicking a bookmark shows the same page in the drawn browser; 5 digits show where it would go.
 await page.click('a.bm[data-id="wsheet"]');
